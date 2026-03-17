@@ -5,11 +5,11 @@
 
 **Team Members:**
 
-* [Your Name]
-* Adhil [Last Name]
+* Ozash Pandey
+* Adhil Anwin
 
 **Event:** FBLA Middle School – Exploring Coding & Programming
-**School:** [Your School Name]
+**School:** Prairieview
 **Year:** 2025–2026
 
 ---
