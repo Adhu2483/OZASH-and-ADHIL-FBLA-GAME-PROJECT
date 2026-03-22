@@ -1,0 +1,132 @@
+/* ================= GLOBAL RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Orbitron', sans-serif;
+    overflow: hidden;
+    background: black;
+    color: white;
+    text-align: center;
+}
+
+/* ================= CANVAS ================= */
+canvas {
+    display: block;
+    margin: 0 auto;
+    border: 3px solid #9933ff;
+    background: url('assets/galaxy.gif') center/cover no-repeat;
+}
+
+/* ================= MENU ================= */
+#menu {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 40, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#menu h1 {
+    font-size: 50px;
+    color: #ff99ff;
+    text-shadow: 0 0 15px #6600cc, 0 0 30px #ff33ff;
+    margin-bottom: 20px;
+}
+
+#menu p {
+    font-size: 20px;
+    color: #ccddff;
+    margin-bottom: 10px;
+}
+
+#menu button {
+    font-size: 26px;
+    padding: 12px 28px;
+    background: linear-gradient(45deg, #9933ff, #33ccff);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    color: white;
+    margin-top: 15px;
+    box-shadow: 0 0 20px #9933ff, 0 0 40px #33ccff;
+    transition: all 0.3s ease;
+}
+
+#menu button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px #ff33ff, 0 0 60px #33ccff;
+}
+
+/* ================= UI TEXT ================= */
+#scoreboard {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 24px;
+    text-shadow: 0 0 5px black, 0 0 10px #6600ff;
+}
+
+#info {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    font-size: 22px;
+    text-shadow: 0 0 5px black, 0 0 10px #33ccff;
+}
+
+/* ================= SOURCES ================= */
+#sources {
+    margin-top: 30px;
+    width: 80%;
+    text-align: left;
+    background: rgba(20, 0, 40, 0.8);
+    border: 2px solid #9933ff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 20px #6600ff, 0 0 40px #ff33ff;
+}
+
+#sources h2 {
+    font-size: 28px;
+    color: #ff99ff;
+    text-shadow: 0 0 10px #ff33ff, 0 0 20px #9933ff;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#sources ul {
+    list-style-type: none;
+}
+
+#sources ul li {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #ccddff;
+    text-shadow: 0 0 5px #33ccff;
+}
+
+#sources ul li a {
+    color: #33ccff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+#sources ul li a:hover {
+    color: #ff99ff;
+    text-shadow: 0 0 10px #ff33ff, 0 0 20px #33ccff;
+    transform: scale(1.05);
+}
+#conditions ul {
+    list-style-type: none;
+}

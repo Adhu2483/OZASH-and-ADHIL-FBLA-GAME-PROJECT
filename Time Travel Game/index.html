@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Time Traveler: Apollo Mission</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ================= START MENU ================= -->
+<div id="menu">
+    <h1>⏳ Time Traveler: Apollo Mission</h1>
+
+    <!-- Instructions -->
+    <p><strong>Level 1 — Meteor Catcher:</strong> Collect 10 meteors within 30 seconds!</p>
+    <p><strong>Level 2 — Lunar Rover:</strong> Dodge asteroids for 15 seconds!</p>
+    <p><strong>Level 3 — Space Quiz:</strong> Answer questions on space history to earn points!</p>
+    <p>Controls: <strong>Arrow Keys</strong> or <strong>WASD</strong> to move. Use number keys (1/2/3) to answer quiz questions.</p>
+
+    <button id="startBtn">Start Game</button>
+
+    <!-- Historical Sources -->
+    <div id="sources">
+    <h2>Sources</h2>
+    <ul>
+        <li>NASA Apollo 11 - <a href="https://www.nasa.gov/mission_pages/apollo/apollo11.html" target="_blank">nasa.gov</a></li>
+        <li>NASA History - <a href="https://www.nasa.gov/about/history/index.html" target="_blank">nasa.gov</a></li>
+        <li>Britannica Apollo 11 - <a href="https://www.britannica.com/topic/Apollo-11" target="_blank">britannica.com</a></li>
+        <li>History.com 1960s - <a href="https://www.history.com/topics/1960s" target="_blank">history.com</a></li>
+        <li>History.com Civil Rights - <a href="https://www.history.com/topics/civil-rights-movement" target="_blank">history.com</a></li>
+        <li>Britannica Beatles - <a href="https://www.britannica.com/biography/The-Beatles" target="_blank">britannica.com</a></li>
+        <li>NASA Yuri Gagarin - <a href="https://www.nasa.gov/feature/yuri-gagarin-first-human-in-space" target="_blank">nasa.gov</a></li>
+        <li>Britannica Cold War - <a href="https://www.britannica.com/event/Cold-War" target="_blank">britannica.com</a></li>
+    </ul>
+</div>
+    <!-- Win/Loss Conditions -->
+    <div id="conditions">
+        <h2>Win / Loss Conditions</h2>
+        <ul>
+            <li><strong>Level 1 (Meteor Catcher):</strong> Collect 10 meteors in 30 seconds to win.</li>
+            <li><strong>Level 2 (Lunar Rover):</strong> Dodge all obstacles for 15 seconds to win. Hitting any obstacle = lose.</li>
+            <li><strong>Level 3 (Space Quiz):</strong> Answer 5 randomized questions. Get at least 3 correct to win.</li>
+        </ul>
+    </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+<div id="scoreboard"></div>
+<div id="info"></div>
+
+<script src="game.js"></script>
+</body>
+</html>
