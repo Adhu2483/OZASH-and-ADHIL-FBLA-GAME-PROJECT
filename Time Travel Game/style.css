@@ -1,55 +1,59 @@
-/* ================= GLOBAL RESET ================= */
+/* Reset default browser styles so layout is consistent across devices */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Base page styling and overall theme */
 html, body {
     width: 100%;
     height: 100%;
-    font-family: 'Orbitron', sans-serif;
-    overflow: hidden;
+    font-family: 'Orbitron', sans-serif; /* futuristic font for space theme */
+    overflow: hidden; /* prevents scrolling during gameplay */
     background: black;
     color: white;
     text-align: center;
 }
 
-/* ================= CANVAS ================= */
+/* Main game canvas where everything is rendered */
 canvas {
     display: block;
     margin: 0 auto;
-    border: 3px solid #9933ff;
-    background: url('assets/galaxy.gif') center/cover no-repeat;
+    border: 3px solid #9933ff; /* glowing border for sci-fi feel */
+    background: url('assets/galaxy.gif') center/cover no-repeat; /* animated space background */
 }
 
-/* ================= MENU ================= */
+/* Start menu overlay that appears before the game begins */
 #menu {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 40, 0.95);
+    background: rgba(0, 0, 40, 0.95); /* dark transparent overlay */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 20px;
-    overflow-y: auto;
+    overflow-y: auto; /* allows scrolling if content overflows */
 }
 
+/* Main title styling */
 #menu h1 {
     font-size: 50px;
     color: #ff99ff;
-    text-shadow: 0 0 15px #6600cc, 0 0 30px #ff33ff;
+    text-shadow: 0 0 15px #6600cc, 0 0 30px #ff33ff; /* glowing neon effect */
     margin-bottom: 20px;
 }
 
+/* Instruction text inside menu */
 #menu p {
     font-size: 20px;
     color: #ccddff;
     margin-bottom: 10px;
 }
 
+/* Start button styling with gradient and glow */
 #menu button {
     font-size: 26px;
     padding: 12px 28px;
@@ -63,12 +67,13 @@ canvas {
     transition: all 0.3s ease;
 }
 
+/* Button hover effect to make UI feel interactive */
 #menu button:hover {
     transform: scale(1.1);
     box-shadow: 0 0 30px #ff33ff, 0 0 60px #33ccff;
 }
 
-/* ================= UI TEXT ================= */
+/* Scoreboard shown during gameplay (top-left corner) */
 #scoreboard {
     position: absolute;
     top: 10px;
@@ -77,6 +82,7 @@ canvas {
     text-shadow: 0 0 5px black, 0 0 10px #6600ff;
 }
 
+/* Feedback text (quiz results, messages) shown at bottom */
 #info {
     position: absolute;
     bottom: 10px;
@@ -85,7 +91,7 @@ canvas {
     text-shadow: 0 0 5px black, 0 0 10px #33ccff;
 }
 
-/* ================= SOURCES ================= */
+/* Sources section to display research references */
 #sources {
     margin-top: 30px;
     width: 80%;
@@ -97,6 +103,7 @@ canvas {
     box-shadow: 0 0 20px #6600ff, 0 0 40px #ff33ff;
 }
 
+/* Sources title styling */
 #sources h2 {
     font-size: 28px;
     color: #ff99ff;
@@ -105,10 +112,12 @@ canvas {
     text-align: center;
 }
 
+/* Remove default bullet points for cleaner look */
 #sources ul {
     list-style-type: none;
 }
 
+/* Individual source items */
 #sources ul li {
     margin-bottom: 10px;
     font-size: 18px;
@@ -116,17 +125,21 @@ canvas {
     text-shadow: 0 0 5px #33ccff;
 }
 
+/* Links styled to match color theme */
 #sources ul li a {
     color: #33ccff;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
+/* Hover effect for links to improve usability */
 #sources ul li a:hover {
     color: #ff99ff;
     text-shadow: 0 0 10px #ff33ff, 0 0 20px #33ccff;
     transform: scale(1.05);
 }
+
+/* Removes bullets from win/loss condition list */
 #conditions ul {
     list-style-type: none;
 }
