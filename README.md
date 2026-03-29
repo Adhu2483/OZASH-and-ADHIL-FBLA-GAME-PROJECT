@@ -28,7 +28,7 @@ The game combines **interactive gameplay** with **historical learning**, teachin
 
 * Player movement using **arrow key controls**
 * **Score system** based on collected items
-* **Two levels** of gameplay
+* **Two levels** of gameplay, and one level of quiz questions related to the decade
 * **Timer-based challenge**
 * **Win and lose conditions**
 * Randomly displayed **historical facts**
