@@ -1,4 +1,4 @@
-// ================= INITIAL SETUP =================
+// Initial Setup: grab canvas and UI elements
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreboard = document.getElementById("scoreboard");
@@ -6,6 +6,14 @@ const info = document.getElementById("info");
 const menu = document.getElementById("menu");
 const startBtn = document.getElementById("startBtn");
 
+// Load game images
+const rocketImg = new Image();
+rocketImg.src = "assets/rocket.png";
+
+const asteroidImg = new Image();
+asteroidImg.src = "assets/asteroid.png";
+
+// Make canvas always fill the screen
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -13,31 +21,43 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// ================= INPUT =================
+// Track key presses for movement and quiz input
 let keys = {};
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
-// ================= GAME STATE =================
+// Core game variables
 let level = 1;
 let score = 0;
 let timeLeft = 30;
 let roverTime = 15;
 
+// Timers for different game mechanics
 let timerInterval;
 let roverInterval;
 let factInterval;
 
+// Game objects
 let player;
-let fallingOrbs = [];
-let obstacles = [];
+let fallingRockets = [];
+let asteroids = [];
 
+// Quiz-related state
 let quizActive = false;
 let currentQuestion = 0;
 let quizScore = 0;
 let selectedQuiz = [];
 
-// ================= PLAYER =================
+// Game report storage
+let gameReport = {
+    level1Score: 0,
+    level1TimeUsed: 0,
+    level2SurvivalTime: 0,
+    quizCorrect: 0,
+    quizTotal: 5
+};
+
+// Player class controls movement and rendering
 class Player {
     constructor() {
         this.size = 50;
@@ -45,11 +65,15 @@ class Player {
         this.y = canvas.height - 100;
         this.speed = 7;
     }
+
+    // Move left/right while staying on screen
     move() {
         if(keys["ArrowLeft"] || keys["a"]) this.x -= this.speed;
         if(keys["ArrowRight"] || keys["d"]) this.x += this.speed;
         this.x = Math.max(0, Math.min(this.x, canvas.width - this.size));
     }
+
+    // Draw player as a triangle with gradient styling
     draw() {
         ctx.save();
         ctx.translate(this.x + this.size/2, this.y + this.size/2);
@@ -58,9 +82,11 @@ class Player {
         ctx.lineTo(this.size/2, this.size/2);
         ctx.lineTo(-this.size/2, this.size/2);
         ctx.closePath();
+
         const grad = ctx.createLinearGradient(-this.size/2, -this.size/2, this.size/2, this.size/2);
         grad.addColorStop(0, "#00ffff");
         grad.addColorStop(1, "#6600ff");
+
         ctx.fillStyle = grad;
         ctx.fill();
         ctx.strokeStyle = "white";
@@ -69,14 +95,16 @@ class Player {
     }
 }
 
-// ================= ORBS =================
-class Orb {
+// Rocket class: collectible objects that increase score
+class Rocket {
     constructor() {
-        this.size = 30;
+        this.size = 40;
         this.x = Math.random() * (canvas.width - this.size);
         this.y = -this.size - Math.random() * canvas.height;
         this.speed = 2 + Math.random() * 3;
     }
+
+    // Move downward and respawn at top when off screen
     update() {
         this.y += this.speed;
         if(this.y > canvas.height) {
@@ -84,30 +112,30 @@ class Orb {
             this.x = Math.random() * (canvas.width - this.size);
         }
     }
+
+    // Draw as a simple glowing circle
     draw() {
-        ctx.fillStyle = "#33ccff";
-        ctx.beginPath();
-        ctx.arc(this.x + this.size/2, this.y + this.size/2, this.size/2, 0, Math.PI*2);
-        ctx.fill();
-    }
+        ctx.drawImage(rocketImg, this.x, this.y, this.size, this.size);
+}
 }
 
-// ================= OBSTACLES =================
-class Obstacle {
+// Asteroid class: obstacles that the player must avoid
+class Asteroid {
     constructor() {
-        this.width = 40 + Math.random()*30;
-        this.height = 40 + Math.random()*30;
+        this.width = 60 + Math.random()*30;
+        this.height = 60 + Math.random()*30;
         this.x = Math.random()*(canvas.width-this.width);
         this.y = -this.height;
 
-        // ✅ RANDOM SPEED
+        // Random speed makes movement less predictable
         this.speed = 2 + Math.random()*4;
 
-        // ✅ RANDOM COLORS
+        // Random color for visual variety
         this.color = ["#ff4444", "#ff99ff", "#33ccff", "#ffcc00", "#66ff66"]
             [Math.floor(Math.random()*5)];
     }
 
+    // Move downward and recycle when off screen
     update() {
         this.y += this.speed;
         if(this.y > canvas.height) {
@@ -116,16 +144,13 @@ class Obstacle {
         }
     }
 
+    // Draw as a colored rectangle with border
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-
-        ctx.strokeStyle = "white";
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
-    }
+        ctx.drawImage(asteroidImg, this.x, this.y, this.width, this.height);
+}
 }
 
-// ================= FACTS =================
+// Historical facts displayed during gameplay
 let facts1960 = [
     "The first televised presidential debate took place in 1960.",
     "John F. Kennedy became president in 1961.",
@@ -151,15 +176,17 @@ let facts1960 = [
 
 let currentFact = "";
 
+// Rotates facts every few seconds
 function startFactTimer() {
     showRandomFact();
     factInterval = setInterval(showRandomFact, 8000);
 }
+
 function showRandomFact() {
     currentFact = facts1960[Math.floor(Math.random()*facts1960.length)];
 }
 
-// ================= QUIZ =================
+// Quiz questions for final level
 let quizQuestions = [
     { q: "Apollo 11 year?", choices:["1965","1969","1972"], answer:1 },
     { q: "First moon walker?", choices:["Aldrin","Armstrong","Gagarin"], answer:1 },
@@ -169,8 +196,10 @@ let quizQuestions = [
     { q: "First human in space?", choices:["Gagarin","Glenn","Shepard"], answer:0 }
 ];
 
+// Randomizes quiz order
 function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
 
+// Starts quiz mode and resets counters
 function startQuiz(){
     selectedQuiz = shuffle([...quizQuestions]).slice(0,5);
     quizActive = true;
@@ -178,10 +207,17 @@ function startQuiz(){
     quizScore = 0;
 }
 
-// ================= HELPERS =================
-function spawnOrbs(n=8){ for(let i=0;i<n;i++) fallingOrbs.push(new Orb()); }
-function spawnObstacles(n=8){ for(let i=0;i<n;i++) obstacles.push(new Obstacle()); }
+// Spawns collectible rockets
+function spawnRockets(n=8){ 
+    for(let i=0;i<n;i++) fallingRockets.push(new Rocket()); 
+}
 
+// Spawns asteroid obstacles
+function spawnAsteroids(n=8){ 
+    for(let i=0;i<n;i++) asteroids.push(new Asteroid()); 
+}
+
+// Basic rectangle collision detection
 function collide(a,b){
     return a.x < b.x + b.width &&
            a.x + a.size > b.x &&
@@ -189,24 +225,24 @@ function collide(a,b){
            a.y + a.size > b.y;
 }
 
-// ================= LEVELS =================
+// Level 1: collect rockets before time runs out
 function drawLevel1(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     player.move(); player.draw();
 
-    // 👇 THIS LINE FIXES YOUR PROBLEM
-    if(fallingOrbs.length < 5) spawnOrbs(1);
+    if(fallingRockets.length < 5) spawnRockets(1);
 
-    fallingOrbs.forEach((o,i)=>{
+    fallingRockets.forEach((o,i)=>{
         o.update(); o.draw();
 
+        // If player touches a rocket, gain a point
         if(player.x < o.x + o.size &&
            player.x + player.size > o.x &&
            player.y < o.y + o.size &&
            player.y + player.size > o.y){
 
             score++;
-            fallingOrbs.splice(i,1);
+            fallingRockets.splice(i,1);
         }
     });
 
@@ -217,25 +253,29 @@ function drawLevel1(){
 
     scoreboard.innerText=`Level 1 — ${score}/10 | ${timeLeft}s`;
 
+    // Move to next level once enough rockets collected
     if(score >= 10){
         clearInterval(timerInterval);
         alert("Level 1 complete! Press OK to move onto Level 2!");
         level = 2;
-        obstacles = [];
-        spawnObstacles(5);
+        asteroids = [];
+        spawnAsteroids(5);
         startRoverTimer();
     }
 }
 
+// Level 2: survive asteroid field
 function drawLevel2(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     player.move(); player.draw();
 
-    obstacles.forEach(o=>{
+    asteroids.forEach(o=>{
         o.update(); o.draw();
+
+        // Collision ends the game immediately
         if(collide(player,o)){
             alert("You crashed! Mission failed.");
-            location.reload();
+            setTimeout(() => location.reload(), 100);
         }
     });
 
@@ -247,11 +287,14 @@ function drawLevel2(){
     }
 }
 
+// Timer for survival level
 function startRoverTimer(){
     roverInterval = setInterval(()=>{
         roverTime--;
         if(roverTime<=0){
             clearInterval(roverInterval);
+            // Save Level 2 stats
+            gameReport.level2SurvivalTime = 15; // full time survived
             alert("Level 2 complete! Press OK to move onto Level 3!");
             level = 3;
             scoreboard.innerText="";
@@ -260,42 +303,58 @@ function startRoverTimer(){
     },1000);
 }
 
+// Level 3: quiz challenge
 function drawLevel3(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     if(!quizActive) return;
 
     let q = selectedQuiz[currentQuestion];
 
-    // Question text
     ctx.fillStyle="#cc99ff";
     ctx.font="32px Orbitron";
     ctx.textAlign="center";
     ctx.fillText(q.q, canvas.width/2, 120);
 
-    // Choices
     ctx.font="24px Orbitron";
     q.choices.forEach((c,i)=>{
         ctx.fillStyle="#33ccff";
         ctx.fillText(`${i+1}. ${c}`, canvas.width/2, 200+i*50);
     });
 
-    // ================= COUNTERS =================
-
-    // Question counter
     ctx.fillStyle="#ffffff";
     ctx.font="20px Orbitron";
     ctx.fillText(`Question: ${currentQuestion + 1} / 5`, canvas.width/2, 60);
 
-    // Accuracy counter
     let wrong = currentQuestion - quizScore;
-
     ctx.fillText(`Correct: ${quizScore}   Wrong: ${wrong}`, canvas.width/2, 420);
 
-    // Instruction
     ctx.fillText("Press 1, 2, or 3 to answer", canvas.width/2, 470);
 }
 
-// ================= QUIZ INPUT =================
+function showReport(win){
+    alert(
+`=== MISSION REPORT ===
+
+Level 1:
+Score: ${gameReport.level1Score}/10
+Time Used: ${gameReport.level1TimeUsed}s
+
+Level 2:
+Survival Time: ${gameReport.level2SurvivalTime}s
+
+Level 3:
+Quiz Score: ${gameReport.quizCorrect}/${gameReport.quizTotal}
+
+Final Result:
+${win ? "MISSION SUCCESS 🚀" : "MISSION FAILED"}
+`
+    );
+
+    // Ensure browser reload works
+    setTimeout(() => location.reload(), 100);
+}
+
+// Handles quiz answers
 document.addEventListener("keydown", e=>{
     if(level===3 && quizActive && ["1","2","3"].includes(e.key)){
         let q = selectedQuiz[currentQuestion];
@@ -309,27 +368,28 @@ document.addEventListener("keydown", e=>{
 
         currentQuestion++;
 
+        // End quiz after 5 questions
         if(currentQuestion >= 5){
             quizActive = false;
+            // Save quiz stats
+            gameReport.quizCorrect = quizScore;
 
             if(quizScore >= 3){
-                alert(`🎉 You Win! Mission Successful! (${quizScore}/5 correct) You are a true time traveler!`);
+                showReport(true);
             } else {
-                alert(`Mission failed. You got ${quizScore}/5 correct.`);
+                showReport(false);
             }
-
-            location.reload();
         }
     }
 });
 
-// ================= START =================
+// Start button initializes everything
 startBtn.addEventListener("click",()=>{
     menu.style.display="none";
 
     player = new Player();
-    fallingOrbs = [];
-    spawnOrbs(5);
+    fallingRockets = [];
+    spawnRockets(5);
 
     startFactTimer();
 
@@ -337,14 +397,14 @@ startBtn.addEventListener("click",()=>{
         timeLeft--;
         if(timeLeft<=0){
             alert("Time ran out! You Lose.");
-            location.reload();
+            setTimeout(() => location.reload(), 100);
         }
     },1000);
 
     gameLoop();
 });
 
-// ================= LOOP =================
+// Main loop switches between levels
 function gameLoop(){
     if(level===1) drawLevel1();
     else if(level===2) drawLevel2();
