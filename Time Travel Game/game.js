@@ -13,6 +13,9 @@ rocketImg.src = "assets/rocket.png";
 const asteroidImg = new Image();
 asteroidImg.src = "assets/asteroid.png";
 
+const fuelImg = new Image();
+fuelImg.src = "assets/fuel.png"
+
 // Make canvas always fill the screen
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -39,7 +42,7 @@ let factInterval;
 
 // Game objects
 let player;
-let fallingRockets = [];
+let fallingFuels = [];
 let asteroids = [];
 
 // Quiz-related state
@@ -50,8 +53,6 @@ let selectedQuiz = [];
 
 // Game report storage
 let gameReport = {
-    level1Score: 0,
-    level1TimeUsed: 0,
     level2SurvivalTime: 0,
     quizCorrect: 0,
     quizTotal: 5
@@ -60,9 +61,9 @@ let gameReport = {
 // Player class controls movement and rendering
 class Player {
     constructor() {
-        this.size = 50;
+        this.size = 100;
         this.x = canvas.width/2 - this.size/2;
-        this.y = canvas.height - 100;
+        this.y = canvas.height - 110;
         this.speed = 7;
     }
 
@@ -73,32 +74,16 @@ class Player {
         this.x = Math.max(0, Math.min(this.x, canvas.width - this.size));
     }
 
-    // Draw player as a triangle with gradient styling
+    // Draw player as a rocket
     draw() {
-        ctx.save();
-        ctx.translate(this.x + this.size/2, this.y + this.size/2);
-        ctx.beginPath();
-        ctx.moveTo(0, -this.size/2);
-        ctx.lineTo(this.size/2, this.size/2);
-        ctx.lineTo(-this.size/2, this.size/2);
-        ctx.closePath();
-
-        const grad = ctx.createLinearGradient(-this.size/2, -this.size/2, this.size/2, this.size/2);
-        grad.addColorStop(0, "#00ffff");
-        grad.addColorStop(1, "#6600ff");
-
-        ctx.fillStyle = grad;
-        ctx.fill();
-        ctx.strokeStyle = "white";
-        ctx.stroke();
-        ctx.restore();
+        ctx.drawImage(rocketImg, this.x, this.y, this.size, this.size);
     }
 }
 
-// Rocket class: collectible objects that increase score
-class Rocket {
+// Fuel class: collectible objects that increase score
+class Fuel {
     constructor() {
-        this.size = 40;
+        this.size = 120;
         this.x = Math.random() * (canvas.width - this.size);
         this.y = -this.size - Math.random() * canvas.height;
         this.speed = 2 + Math.random() * 3;
@@ -113,9 +98,9 @@ class Rocket {
         }
     }
 
-    // Draw as a simple glowing circle
+    // Draw the fuel image
     draw() {
-        ctx.drawImage(rocketImg, this.x, this.y, this.size, this.size);
+        ctx.drawImage(fuelImg, this.x, this.y, this.size, this.size);
 }
 }
 
@@ -207,9 +192,9 @@ function startQuiz(){
     quizScore = 0;
 }
 
-// Spawns collectible rockets
-function spawnRockets(n=8){ 
-    for(let i=0;i<n;i++) fallingRockets.push(new Rocket()); 
+// Spawns collectible fuels
+function spawnFuels(n=8){ 
+    for(let i=0;i<n;i++) fallingFuels.push(new Fuel()); 
 }
 
 // Spawns asteroid obstacles
@@ -225,24 +210,24 @@ function collide(a,b){
            a.y + a.size > b.y;
 }
 
-// Level 1: collect rockets before time runs out
+// Level 1: collect fuels before time runs out
 function drawLevel1(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     player.move(); player.draw();
 
-    if(fallingRockets.length < 5) spawnRockets(1);
+    if(fallingFuels.length < 5) spawnFuels(1);
 
-    fallingRockets.forEach((o,i)=>{
+    fallingFuels.forEach((o,i)=>{
         o.update(); o.draw();
 
-        // If player touches a rocket, gain a point
+        // If player touches a fuel, gain a point
         if(player.x < o.x + o.size &&
            player.x + player.size > o.x &&
            player.y < o.y + o.size &&
            player.y + player.size > o.y){
 
             score++;
-            fallingRockets.splice(i,1);
+            fallingFuels.splice(i,1);
         }
     });
 
@@ -253,10 +238,11 @@ function drawLevel1(){
 
     scoreboard.innerText=`Level 1 — ${score}/10 | ${timeLeft}s`;
 
-    // Move to next level once enough rockets collected
+    // Move to next level once enough fuels collected
     if(score >= 10){
         clearInterval(timerInterval);
         alert("Level 1 complete! Press OK to move onto Level 2!");
+        keys = {}; // reset any stuck keys
         level = 2;
         asteroids = [];
         spawnAsteroids(5);
@@ -275,6 +261,7 @@ function drawLevel2(){
         // Collision ends the game immediately
         if(collide(player,o)){
             alert("You crashed! Mission failed.");
+            keys = {}; // reset any stuck keys
             setTimeout(() => location.reload(), 100);
         }
     });
@@ -296,6 +283,7 @@ function startRoverTimer(){
             // Save Level 2 stats
             gameReport.level2SurvivalTime = 15; // full time survived
             alert("Level 2 complete! Press OK to move onto Level 3!");
+            keys = {}; // reset any stuck keys
             level = 3;
             scoreboard.innerText="";
             startQuiz();
@@ -336,8 +324,8 @@ function showReport(win){
 `=== MISSION REPORT ===
 
 Level 1:
-Score: ${gameReport.level1Score}/10
-Time Used: ${gameReport.level1TimeUsed}s
+Score: ${score}/10
+Time Used: ${timeLeft}s
 
 Level 2:
 Survival Time: ${gameReport.level2SurvivalTime}s
@@ -349,6 +337,7 @@ Final Result:
 ${win ? "MISSION SUCCESS 🚀" : "MISSION FAILED"}
 `
     );
+    keys = {}; // reset any stuck keys
 
     // Ensure browser reload works
     setTimeout(() => location.reload(), 100);
@@ -388,8 +377,8 @@ startBtn.addEventListener("click",()=>{
     menu.style.display="none";
 
     player = new Player();
-    fallingRockets = [];
-    spawnRockets(5);
+    fallingFuels = [];
+    spawnFuels(5);
 
     startFactTimer();
 
