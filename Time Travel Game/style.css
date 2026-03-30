@@ -21,7 +21,6 @@ canvas {
     display: block;
     margin: 0 auto;
     border: 3px solid #9933ff; /* glowing border for sci-fi feel */
-    background: url('assets/galaxy.gif') center/cover no-repeat; /* animated space background */
 }
 
 /* Start menu overlay that appears before the game begins */
